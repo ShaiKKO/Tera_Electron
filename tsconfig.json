@@ -13,7 +13,8 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
+    "noEmit": false,
+    "outDir": "./dist/tsc-build",
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {

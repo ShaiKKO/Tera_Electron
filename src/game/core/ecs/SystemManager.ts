@@ -89,20 +89,10 @@ export class SystemManager {
   }
   
   /**
-   * Get a system by ID
-   * 
-   * @param systemId The ID of the system to get
-   * @returns The system, or undefined if not found
-   */
-  public getSystem<T extends System>(systemId: SystemId): T | undefined {
-    return this.systems.get(systemId) as T | undefined;
-  }
-  
-  /**
-   * Check if a system is registered
+   * Check if a system exists
    * 
    * @param systemId The ID of the system to check
-   * @returns True if the system is registered
+   * @returns True if the system exists
    */
   public hasSystem(systemId: SystemId): boolean {
     return this.systems.has(systemId);
@@ -273,12 +263,20 @@ export class SystemManager {
   }
   
   /**
-   * Get the number of registered systems
+   * Get the total number of registered systems
    * 
    * @returns The number of registered systems
    */
   public getSystemCount(): number {
     return this.systems.size;
+  }
+  
+  /**
+   * Get the number of enabled systems
+   * @returns Number of enabled systems
+   */
+  public getEnabledSystemCount(): number {
+    return Array.from(this.systems.values()).filter(system => system.enabled).length;
   }
   
   /**

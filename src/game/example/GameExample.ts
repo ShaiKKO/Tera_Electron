@@ -128,30 +128,65 @@ export class GameExample {
     game.eventEmitter.subscribe(GameEventType.UPDATE, this.onGameUpdate.bind(this));
   }
   
-  /**
-   * Initialize the game example
-   */
-  public async init() {
-    // Configure and initialize the game
-    game.debug = true;
-    game.targetFPS = 60;
-    
-    await game.initialize();
-    
-    // Create systems
-    const bounceSystem = new BounceSystem();
-    systemManager.addSystem(bounceSystem);
-    
-    // Create entities
-    this.createEntities();
-    
-    // Start the game
-    game.start();
-    
-    console.log('Game example initialized with', entityManager.getEntityCount(), 'entities');
-    
-    return game;
-  }
+/**
+ * Initialize the game example
+ */
+public async init() {
+  // Configure and initialize the game
+  game.debug = true;
+  game.targetFPS = 60;
+  game.useFixedTimestep = false; // Use variable timestep by default
+  game.timeScale = 1.0; // Normal speed
+  
+  await game.initialize();
+  
+  // Create systems
+  const bounceSystem = new BounceSystem();
+  systemManager.addSystem(bounceSystem);
+  
+  // Create entities
+  this.createEntities();
+  
+  // Set up event listeners for game loop changes
+  game.eventEmitter.subscribe(GameEventType.TIME_SCALE_CHANGED, this.onTimeScaleChanged.bind(this));
+  game.eventEmitter.subscribe(GameEventType.TIMESTEP_MODE_CHANGED, this.onTimestepModeChanged.bind(this));
+  game.eventEmitter.subscribe(GameEventType.PERFORMANCE_SNAPSHOT, this.onPerformanceSnapshot.bind(this));
+  
+  // Start the game
+  game.start();
+  
+  console.log('Game example initialized with', entityManager.getEntityCount(), 'entities');
+  
+  return game;
+}
+
+/**
+ * Called when the time scale changes
+ */
+private onTimeScaleChanged(game: any, timeScale: number): void {
+  console.log(`Time scale changed to ${timeScale.toFixed(1)}x`);
+  
+  // We could use this to visually indicate the current speed
+  // For example, changing a UI element or adjusting animations
+}
+
+/**
+ * Called when the timestep mode changes
+ */
+private onTimestepModeChanged(game: any, useFixedTimestep: boolean): void {
+  console.log(`Switched to ${useFixedTimestep ? 'fixed' : 'variable'} timestep mode`);
+  
+  // Could adjust UI or physics behavior based on timestep mode
+}
+
+/**
+ * Called when a performance snapshot is taken
+ */
+private onPerformanceSnapshot(game: any, snapshot: any): void {
+  console.log('Performance snapshot:', snapshot);
+  
+  // Could display detailed performance metrics in a UI
+}
   
   /**
    * Called when the game is initialized

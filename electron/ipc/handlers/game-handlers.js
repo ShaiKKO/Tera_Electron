@@ -48,6 +48,9 @@ function initializeGame(window, config = {}) {
   const gameConfig = {
     debug: true,
     targetFPS: 60,
+    useFixedTimestep: false,
+    fixedTimestepValue: 1/60,
+    timeScale: 1.0,
     ...config
   };
   

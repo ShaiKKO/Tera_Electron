@@ -108,6 +108,9 @@ function createMainWindow() {
         <div>
           <button id="restart">Restart Game</button>
           <button id="toggle-debug">Toggle Debug</button>
+          <button id="toggle-timestep">Toggle Timestep</button>
+          <button id="cycle-speed">Cycle Speed</button>
+          <button id="perf-snapshot">Performance Snapshot</button>
           <button id="add-entity">Add Entity</button>
           <button id="clear-entities">Clear Entities</button>
         </div>
@@ -153,6 +156,30 @@ function createMainWindow() {
               }
             });
 
+            document.getElementById('toggle-timestep').addEventListener('click', () => {
+              if (window.game) {
+                const useFixed = window.game.toggleTimestepMode();
+                console.log('Timestep mode: ' + (useFixed ? 'Fixed' : 'Variable'));
+                window.electron.sendGameLog('Switched to ' + (useFixed ? 'fixed' : 'variable') + ' timestep mode');
+              }
+            });
+
+            document.getElementById('cycle-speed').addEventListener('click', () => {
+              if (window.game) {
+                const newSpeed = window.game.cycleGameSpeed();
+                console.log('Game speed set to ' + newSpeed.toFixed(1) + 'x');
+                window.electron.sendGameLog('Game speed set to ' + newSpeed.toFixed(1) + 'x');
+              }
+            });
+
+            document.getElementById('perf-snapshot').addEventListener('click', () => {
+              if (window.game) {
+                const snapshot = window.game.takePerformanceSnapshot();
+                console.log('Performance snapshot:', snapshot);
+                window.electron.sendGameLog('Performance snapshot taken at ' + new Date().toLocaleTimeString());
+              }
+            });
+
             document.getElementById('add-entity').addEventListener('click', () => {
               if (window.gameExample) {
                 const { entityManager } = window.game;
@@ -191,22 +218,25 @@ function createMainWindow() {
             if (!stats) return;
             
             if (fpsEl) {
-              fpsEl.textContent = \`FPS: \${stats.fps.toFixed(1)}\`;
+              fpsEl.textContent = 'FPS: ' + stats.fps.toFixed(1);
             }
             
             if (statsEl) {
-              statsEl.innerHTML = \`
-                FPS: \${stats.fps.toFixed(1)}<br>
-                Entities: \${stats.entityCount || 0}<br>
-                Frame: \${stats.totalFrames}<br>
-                Delta: \${(stats.deltaTime * 1000).toFixed(2)}ms
-              \`;
+              statsEl.innerHTML = 
+                'FPS: ' + stats.fps.toFixed(1) + '<br>' +
+                'Entities: ' + (stats.entityCount || 0) + '<br>' +
+                'Systems: ' + (stats.systemCount || 0) + '<br>' +
+                'Frame: ' + stats.totalFrames + '<br>' +
+                'Speed: ' + (stats.timeScale ? stats.timeScale.toFixed(1) + 'x' : '1.0x') + '<br>' +
+                'Update: ' + (stats.updateTime ? stats.updateTime.toFixed(2) + 'ms' : '-') + '<br>' +
+                'Render: ' + (stats.renderTime ? stats.renderTime.toFixed(2) + 'ms' : '-') + '<br>' +
+                'Dropped: ' + (stats.droppedFrames || 0);
             }
           }
 
           // Handle game state updates
           window.electron.onMessage('game:state', (state) => {
-            statusEl.textContent = \`Game State: \${state}\`;
+            statusEl.textContent = 'Game State: ' + state;
           });
 
           // Handle game stats updates
@@ -217,7 +247,7 @@ function createMainWindow() {
           // Handle game error messages
           window.electron.onMessage('game:error', (error) => {
             console.error('Game error:', error);
-            statusEl.textContent = \`Game Error: \${error}\`;
+            statusEl.textContent = 'Game Error: ' + error;
             statusEl.style.color = 'red';
           });
         });
@@ -238,7 +268,10 @@ function createMainWindow() {
     // Send game settings to renderer
     mainWindow.webContents.send('game:init', {
       debug: true,
-      targetFPS: 60
+      targetFPS: 60,
+      useFixedTimestep: false,
+      fixedTimestepValue: 1/60,
+      timeScale: 1.0
     });
     
     log.info('Game test window loaded and initialized');

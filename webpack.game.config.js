@@ -111,8 +111,8 @@ module.exports = {
   }
 };
 
-// Export additional reusable configs
-module.exports.paths = {
+// Path constants for reference (not exported)
+const paths = {
   src: path.resolve(__dirname, 'src'),
   game: path.resolve(__dirname, 'src/game'),
   dist: path.resolve(__dirname, 'dist', 'game')

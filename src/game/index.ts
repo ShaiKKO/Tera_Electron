@@ -29,6 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Apply configuration
     if (config.debug !== undefined) game.debug = config.debug;
     if (config.targetFPS !== undefined) game.targetFPS = config.targetFPS;
+    if (config.useFixedTimestep !== undefined) game.useFixedTimestep = config.useFixedTimestep;
+    if (config.fixedTimestepValue !== undefined) game.fixedTimestepValue = config.fixedTimestepValue;
+    if (config.timeScale !== undefined) game.timeScale = config.timeScale;
     
     // Initialize the game example
     initGame();
@@ -71,7 +74,12 @@ async function initGame() {
 function onGameUpdate(game: any, deltaTime: number) {
   // Send game stats to Electron every second
   if (game.stats.totalFrames % 60 === 0) {
-    window.electron.sendGameStats(game.stats);
+    // Add deltaTime to the stats
+    const statsWithDelta = {
+      ...game.stats,
+      deltaTime
+    };
+    window.electron.sendGameStats(statsWithDelta);
   }
 }
 
@@ -85,5 +93,37 @@ function onGameError(game: any, error: Error) {
 
 // Electron interface types are defined in src/app/types/electron.d.ts
 
+// Export coordinate system components
+import { CoordinateSystem } from './core/utils/CoordinateSystem';
+import { CoordinateSystemVerification } from './core/utils/CoordinateSystemVerification';
+import { HexPositionComponent } from './components/HexPosition';
+import { HexPathfinding } from './core/pathfinding/HexPathfinding';
+
 // Export the game for direct access
-export { game, gameExample };
+export { 
+  game, 
+  gameExample,
+  // Coordinate system exports
+  CoordinateSystem,
+  CoordinateSystemVerification,
+  HexPositionComponent,
+  HexPathfinding
+};
+
+// Add to window.TeraFlux if it exists (for testing)
+if (typeof window !== 'undefined') {
+  // Create TeraFlux namespace if doesn't exist
+  if (!window.TeraFlux) {
+    window.TeraFlux = { Game: {} };
+  } else if (!window.TeraFlux.Game) {
+    window.TeraFlux.Game = {};
+  }
+  
+  // Add coordinate system components to TeraFlux namespace
+  if (window.TeraFlux && window.TeraFlux.Game) {
+    window.TeraFlux.Game.CoordinateSystem = CoordinateSystem;
+    window.TeraFlux.Game.CoordinateSystemVerification = CoordinateSystemVerification;
+    window.TeraFlux.Game.HexPositionComponent = HexPositionComponent;
+    window.TeraFlux.Game.HexPathfinding = HexPathfinding;
+  }
+}
