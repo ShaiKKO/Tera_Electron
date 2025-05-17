@@ -20,18 +20,21 @@ import {
   InputSettings,
   AccessibilityOptions,
   TouchPoint,
-  GameContext
+  InputContext
 } from './types';
 
 /**
  * Default accessibility options
  */
 const DEFAULT_ACCESSIBILITY_OPTIONS: AccessibilityOptions = {
+  keyRepeatEnabled: true,
+  autoRepeatDelay: 500,
+  autoRepeatRate: 50,
+  mouseHelpers: true,
+  highContrastMode: false,
+  slowMotionFactor: 1.0,
   inputSensitivity: 1.0,
-  deadZone: 0.1,
-  repeatDelay: 500,
-  repeatRate: 50,
-  uiScale: 1.0
+  deadZone: 0.1
 };
 
 /**
@@ -178,8 +181,8 @@ export class InputManager {
     this.contextHandler.onContextChanged((context) => {
       // Disable camera movement in menu/dialog contexts
       const disableCameraControl = 
-        context === GameContext.MENU_OPEN || 
-        context === GameContext.DIALOG_OPEN;
+        context === InputContext.MENU_OPEN || 
+        context === InputContext.DIALOG_OPEN;
       
       // Could do more context-specific handling here
     });
@@ -564,9 +567,14 @@ export class InputManager {
   ): void {
     // Create input event
     const inputEvent: InputEvent = {
-      type: inputType,
       action,
+      inputType,
+      inputCode: rawEvent ? (rawEvent.key || rawEvent.button || '') : '',
       value,
+      context: this.contextHandler.getContext(),
+      timestamp: performance.now(),
+      type: (typeof inputType === 'string') ? inputType : InputType[inputType],
+      position: this.inputState.mouseState.position,
       rawEvent
     };
     

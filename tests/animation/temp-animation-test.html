@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TerraFlux - Animation & Visual Effects Test</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #eee;
+      overflow: hidden;
+    }
+    
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+    
+    .render-container {
+      flex-grow: 1;
+      position: relative;
+    }
+    
+    .control-panel {
+      width: 300px;
+      padding: 20px;
+      background-color: #222;
+      border-left: 1px solid #333;
+      overflow-y: auto;
+    }
+    
+    .header {
+      height: 40px;
+      padding: 10px 20px;
+      background-color: #333;
+      border-bottom: 1px solid #444;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .footer {
+      height: 30px;
+      padding: 5px 20px;
+      background-color: #333;
+      border-top: 1px solid #444;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+    
+    .stats {
+      display: flex;
+      gap: 20px;
+    }
+    
+    #render-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    
+    .entity-controls {
+      margin-bottom: 20px;
+      padding: 10px;
+      background-color: #2a2a2a;
+      border-radius: 5px;
+    }
+    
+    .entity-header {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #444;
+    }
+    
+    .entity-header h3 {
+      margin: 0;
+      padding-bottom: 5px;
+      font-size: 1rem;
+    }
+    
+    .control-group {
+      margin-bottom: 10px;
+    }
+    
+    .effect-button {
+      margin-right: 5px;
+      margin-bottom: 5px;
+      padding: 5px 10px;
+      background-color: #3a7ca8;
+      border: none;
+      border-radius: 3px;
+      color: white;
+      cursor: pointer;
+    }
+    
+    .effect-button:hover {
+      background-color: #4a8cb8;
+    }
+    
+    .camera-controls {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #2a2a2a;
+      border-radius: 5px;
+    }
+    
+    .camera-controls h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+    
+    .zoom-control {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .zoom-control label {
+      margin-right: 10px;
+      min-width: 40px;
+    }
+    
+    #zoom-slider {
+      flex-grow: 1;
+    }
+    
+    #loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      color: white;
+    }
+    
+    .spinner {
+      border: 5px solid #333;
+      border-top: 5px solid #3a7ca8;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+<script defer src="test-animation-renderer.bundle.js"></script></head>
+<body>
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div>Loading Animation & Visual Effects Test...</div>
+  </div>
+  
+  <div class="header">
+    <h1>TerraFlux - Animation & Visual Effects Test</h1>
+    <div class="stats">
+      <div id="fps">FPS: 0</div>
+      <div id="entity-count">Entities: 0</div>
+      <div id="effect-count">Effects: 0</div>
+    </div>
+  </div>
+  
+  <div class="container">
+    <div class="render-container">
+      <div id="render-canvas"></div>
+    </div>
+    
+    <div class="control-panel">
+      <div class="camera-controls">
+        <h3>Camera Controls</h3>
+        <button id="reset-camera" class="effect-button">Reset Camera</button>
+        <button id="toggle-grid" class="effect-button">Toggle Grid</button>
+        
+        <div class="zoom-control">
+          <label>Zoom:</label>
+          <input type="range" id="zoom-slider" min="0.5" max="2.0" step="0.1" value="1.0">
+        </div>
+      </div>
+      
+      <h3>Entity Controls</h3>
+      <div id="entity-controls-container"></div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <div>TerraFlux Engine - Animation & Visual Effects Module</div>
+    <div>©2025 TerraFlux</div>
+  </div>
+</body>
+</html>

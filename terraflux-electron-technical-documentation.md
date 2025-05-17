@@ -17,7 +17,7 @@ TerraFlux is a colony simulation and exploration game inspired by RimWorld's des
 7. [Building System](#building-system)
 8. [Resource System](#resource-system)
 9. [Expedition System](#expedition-system)
-10. [Rendering System](#rendering-system)
+10. [Rendering System](#rendering-system) (COMPLETED - Phase 3)
 11. [User Interface](#user-interface)
 12. [Multiplayer Implementation](#multiplayer-implementation)
 13. [Data Persistence](#data-persistence)
@@ -37,9 +37,8 @@ TerraFlux is a colony simulation and exploration game inspired by RimWorld's des
 - **Frontend Framework**: React 18.0+
 - **State Management**: Redux + Redux Toolkit
 - **Rendering Engine**: PixiJS 7.0+ (WebGL-based 2D renderer)
-- **Backend (for multiplayer)**: Node.js with Express
-- **Database**: SQLite (local storage) + MongoDB (multiplayer)
-- **Networking**: Socket.IO for real-time multiplayer
+- **Backend (for multiplayer)**: SpacetimeDB
+- **Database**: SQLite (local storage) + SpacetimeDB (multiplayer)
 - **Build Tools**: Webpack, Babel, TypeScript
 - **Testing**: Jest, React Testing Library
 - **Package Management**: npm or yarn
@@ -53,6 +52,7 @@ TerraFlux is a colony simulation and exploration game inspired by RimWorld's des
 
 ### Key Libraries and Utilities
 
+- **Multiplayer**: SpacetimeDB SDK for real-time synchronization
 - **Pathfinding**: PathFinding.js or custom A* implementation
 - **UI Components**: Ant Design or custom components
 - **Animation**: GSAP for UI animations

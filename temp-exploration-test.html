@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TerraFlux - Exploration System Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+            overflow: hidden;
+        }
+
+        #container {
+            display: flex;
+            height: 100vh;
+        }
+
+        #game-canvas {
+            flex: 1;
+            background-color: #000000;
+        }
+
+        #controls {
+            width: 300px;
+            padding: 15px;
+            background-color: #2d2d2d;
+            border-left: 1px solid #3d3d3d;
+            overflow-y: auto;
+        }
+
+        h1, h2, h3 {
+            color: #4fc3f7;
+            margin-top: 0;
+        }
+
+        button {
+            background-color: #4fc3f7;
+            color: #000000;
+            border: none;
+            padding: 8px 12px;
+            margin: 5px 0;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #03a9f4;
+        }
+
+        button:disabled {
+            background-color: #555555;
+            color: #888888;
+            cursor: not-allowed;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #3d3d3d;
+        }
+
+        .minimap {
+            width: 256px;
+            height: 256px;
+            background-color: #000000;
+            border: 2px solid #4fc3f7;
+            margin: 10px 0;
+        }
+
+        .status {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #aaaaaa;
+        }
+
+        .stats {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .stats div {
+            margin-bottom: 5px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #bbbbbb;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+            background-color: #3a3a3a;
+            color: #ffffff;
+            border: 1px solid #555555;
+        }
+
+        #log {
+            height: 100px;
+            overflow-y: auto;
+            background-color: #222222;
+            padding: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        #log div.error {
+            color: #ff5252;
+        }
+
+        #log div.success {
+            color: #69f0ae;
+        }
+
+        #log div.info {
+            color: #b0bec5;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="game-canvas"></div>
+        <div id="controls">
+            <h1>Exploration System Test</h1>
+            
+            <div class="control-group">
+                <h2>World Generation</h2>
+                <div>
+                    <label for="world-size">World Size:</label>
+                    <select id="world-size">
+                        <option value="tiny">Tiny (10x10)</option>
+                        <option value="small" selected>Small (20x20)</option>
+                        <option value="medium">Medium (30x30)</option>
+                        <option value="large">Large (40x40)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="seed">Random Seed:</label>
+                    <input type="text" id="seed" value="exploration-test-1">
+                </div>
+                <button id="generate-world">Generate World</button>
+            </div>
+            
+            <div class="control-group">
+                <h2>Exploration</h2>
+                <div>
+                    <label for="explore-radius">Exploration Radius:</label>
+                    <input type="range" id="explore-radius" min="1" max="10" value="3">
+                    <span id="radius-value">3</span>
+                </div>
+                <div>
+                    <label for="explore-x">X Coordinate:</label>
+                    <input type="number" id="explore-x" value="0">
+                </div>
+                <div>
+                    <label for="explore-y">Y Coordinate:</label>
+                    <input type="number" id="explore-y" value="0">
+                </div>
+                <button id="explore-location">Explore Location</button>
+                <button id="explore-random">Explore Random Area</button>
+                <button id="discover-feature">Discover Feature</button>
+                <button id="discover-resource">Discover Resource</button>
+            </div>
+            
+            <div class="control-group">
+                <h2>Minimap</h2>
+                <div class="minimap" id="minimap-canvas"></div>
+                <select id="minimap-mode">
+                    <option value="terrain">Terrain Mode</option>
+                    <option value="resources">Resources Mode</option>
+                    <option value="elevation">Elevation Mode</option>
+                    <option value="ownership">Ownership Mode</option>
+                </select>
+                <div>
+                    <label for="zoom-level">Zoom Level:</label>
+                    <input type="range" id="zoom-level" min="0.25" max="4" step="0.25" value="1">
+                    <span id="zoom-value">1.0</span>
+                </div>
+                <button id="update-minimap">Update Minimap</button>
+            </div>
+            
+            <div class="control-group">
+                <h2>Statistics</h2>
+                <div class="stats" id="exploration-stats">
+                    <div>Total Discovered: <span id="stat-discovered">0</span>%</div>
+                    <div>Total Explored: <span id="stat-explored">0</span>%</div>
+                    <div>Discoveries: <span id="stat-discoveries">0</span></div>
+                    <div>Resources Found: <span id="stat-resources">0</span></div>
+                    <div>Features Found: <span id="stat-features">0</span></div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h2>Debug</h2>
+                <button id="toggle-debug">Toggle Debug View</button>
+                <button id="run-verification">Run Verification Tests</button>
+                <button id="reset-all">Reset All</button>
+                <div id="log"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main bundle will be added by webpack -->
+    <script src="test-exploration-renderer.bundle.js"></script>
+</body>
+</html>

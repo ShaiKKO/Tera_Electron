@@ -4,16 +4,16 @@
  * Handles context-sensitive input mapping and processing.
  */
 
-import { InputAction, GameContext, ContextAction } from './types';
+import { InputAction, InputContext, ContextAction } from './types';
 
 /**
  * ContextInputHandler class
  * Maps input actions to different context-specific actions
  */
 export class ContextInputHandler {
-  private currentContext: GameContext = GameContext.DEFAULT;
-  private contextActions: Map<GameContext, Map<InputAction, ContextAction>> = new Map();
-  private contextChangedCallbacks: Array<(context: GameContext) => void> = [];
+  private currentContext: InputContext = InputContext.DEFAULT;
+  private contextActions: Map<InputContext, Map<InputAction, ContextAction>> = new Map();
+  private contextChangedCallbacks: Array<(context: InputContext) => void> = [];
   
   /**
    * Constructor
@@ -29,84 +29,104 @@ export class ContextInputHandler {
     // Set up default context
     const defaultContext = new Map<InputAction, ContextAction>();
     defaultContext.set(InputAction.CONTEXT_ACTION_PRIMARY, {
+      context: InputContext.DEFAULT,
+      action: InputAction.CONTEXT_ACTION_PRIMARY,
       label: 'Select',
       icon: 'select',
       handler: () => console.log('Default primary action')
     });
     defaultContext.set(InputAction.CONTEXT_ACTION_SECONDARY, {
+      context: InputContext.DEFAULT,
+      action: InputAction.CONTEXT_ACTION_SECONDARY,
       label: 'Cancel',
       icon: 'cancel',
       handler: () => console.log('Default secondary action')
     });
-    this.contextActions.set(GameContext.DEFAULT, defaultContext);
+    this.contextActions.set(InputContext.DEFAULT, defaultContext);
     
     // Set up entity selected context
     const entitySelectedContext = new Map<InputAction, ContextAction>();
     entitySelectedContext.set(InputAction.CONTEXT_ACTION_PRIMARY, {
+      context: InputContext.ENTITY_SELECTED,
+      action: InputAction.CONTEXT_ACTION_PRIMARY,
       label: 'Move',
       icon: 'move',
       handler: () => console.log('Move entity')
     });
     entitySelectedContext.set(InputAction.CONTEXT_ACTION_SECONDARY, {
+      context: InputContext.ENTITY_SELECTED,
+      action: InputAction.CONTEXT_ACTION_SECONDARY,
       label: 'Cancel Selection',
       icon: 'cancel',
       handler: () => {
         console.log('Cancel entity selection');
-        this.setContext(GameContext.DEFAULT);
+        this.setContext(InputContext.DEFAULT);
       }
     });
-    this.contextActions.set(GameContext.ENTITY_SELECTED, entitySelectedContext);
+    this.contextActions.set(InputContext.ENTITY_SELECTED, entitySelectedContext);
     
     // Set up building placement context
     const buildingPlacementContext = new Map<InputAction, ContextAction>();
     buildingPlacementContext.set(InputAction.CONTEXT_ACTION_PRIMARY, {
+      context: InputContext.BUILDING_PLACEMENT,
+      action: InputAction.CONTEXT_ACTION_PRIMARY,
       label: 'Place',
       icon: 'checkmark',
       handler: () => console.log('Place building')
     });
     buildingPlacementContext.set(InputAction.CONTEXT_ACTION_SECONDARY, {
+      context: InputContext.BUILDING_PLACEMENT,
+      action: InputAction.CONTEXT_ACTION_SECONDARY,
       label: 'Cancel Placement',
       icon: 'cancel',
       handler: () => {
         console.log('Cancel building placement');
-        this.setContext(GameContext.DEFAULT);
+        this.setContext(InputContext.DEFAULT);
       }
     });
-    this.contextActions.set(GameContext.BUILDING_PLACEMENT, buildingPlacementContext);
+    this.contextActions.set(InputContext.BUILDING_PLACEMENT, buildingPlacementContext);
     
     // Set up menu open context
     const menuOpenContext = new Map<InputAction, ContextAction>();
     menuOpenContext.set(InputAction.CONTEXT_ACTION_PRIMARY, {
+      context: InputContext.MENU_OPEN,
+      action: InputAction.CONTEXT_ACTION_PRIMARY,
       label: 'Select',
       icon: 'select',
       handler: () => console.log('Select menu item')
     });
     menuOpenContext.set(InputAction.CONTEXT_ACTION_SECONDARY, {
+      context: InputContext.MENU_OPEN,
+      action: InputAction.CONTEXT_ACTION_SECONDARY,
       label: 'Back',
       icon: 'back',
       handler: () => console.log('Go back in menu')
     });
-    this.contextActions.set(GameContext.MENU_OPEN, menuOpenContext);
+    this.contextActions.set(InputContext.MENU_OPEN, menuOpenContext);
     
     // Set up dialog open context
     const dialogOpenContext = new Map<InputAction, ContextAction>();
     dialogOpenContext.set(InputAction.CONTEXT_ACTION_PRIMARY, {
+      context: InputContext.DIALOG_OPEN,
+      action: InputAction.CONTEXT_ACTION_PRIMARY,
       label: 'Confirm',
       icon: 'checkmark',
       handler: () => console.log('Confirm dialog')
     });
     dialogOpenContext.set(InputAction.CONTEXT_ACTION_SECONDARY, {
+      context: InputContext.DIALOG_OPEN,
+      action: InputAction.CONTEXT_ACTION_SECONDARY,
       label: 'Cancel',
       icon: 'cancel',
       handler: () => console.log('Cancel dialog')
     });
-    this.contextActions.set(GameContext.DIALOG_OPEN, dialogOpenContext);
+    this.contextActions.set(InputContext.DIALOG_OPEN, dialogOpenContext);
   }
   
   /**
    * Set the current context
    */
-  public setContext(context: GameContext): void {
+  public setContext(context: InputContext): void {
     const previousContext = this.currentContext;
     this.currentContext = context;
     
@@ -119,7 +139,7 @@ export class ContextInputHandler {
   /**
    * Get the current context
    */
-  public getContext(): GameContext {
+  public getContext(): InputContext {
     return this.currentContext;
   }
   
@@ -149,10 +169,13 @@ export class ContextInputHandler {
    * Define a context action
    */
   public defineContextAction(
-    context: GameContext,
+    context: InputContext,
     inputAction: InputAction,
     contextAction: ContextAction
   ): void {
+    // Ensure the context action has the context and action properties set
+    contextAction.context = context;
+    contextAction.action = inputAction;
     let contextMap = this.contextActions.get(context);
     
     if (!contextMap) {
@@ -166,14 +189,14 @@ export class ContextInputHandler {
   /**
    * Get all defined actions for a context
    */
-  public getActionsForContext(context: GameContext): Map<InputAction, ContextAction> | undefined {
+  public getActionsForContext(context: InputContext): Map<InputAction, ContextAction> | undefined {
     return this.contextActions.get(context);
   }
   
   /**
    * Register a callback for context changes
    */
-  public onContextChanged(callback: (context: GameContext) => void): () => void {
+  public onContextChanged(callback: (context: InputContext) => void): () => void {
     this.contextChangedCallbacks.push(callback);
     
     // Return unsubscribe function
@@ -188,17 +211,17 @@ export class ContextInputHandler {
   /**
    * Get context label for UI
    */
-  public getContextLabel(context: GameContext): string {
+  public getContextLabel(context: InputContext): string {
     switch (context) {
-      case GameContext.DEFAULT:
+      case InputContext.DEFAULT:
         return 'Default';
-      case GameContext.ENTITY_SELECTED:
+      case InputContext.ENTITY_SELECTED:
         return 'Entity Selected';
-      case GameContext.BUILDING_PLACEMENT:
+      case InputContext.BUILDING_PLACEMENT:
         return 'Building Placement';
-      case GameContext.MENU_OPEN:
+      case InputContext.MENU_OPEN:
         return 'Menu';
-      case GameContext.DIALOG_OPEN:
+      case InputContext.DIALOG_OPEN:
         return 'Dialog';
       default:
         return 'Unknown';
